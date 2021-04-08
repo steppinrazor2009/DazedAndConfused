@@ -43,7 +43,7 @@ def check_url(manifestname, url, resultsfile):
     """ The [url] command scans a single manifest file via url """
     try:
         data = urllib.request.urlopen(url).read().decode('ascii')
-        dac_contentscan.scan_contents(os.path.basename(file), data)
+        singleresult = dac_contentscan.scan_contents(os.path.basename(manifestname), data)
         jsonoutput = json.dumps(singleresult, indent=4)
         dac_constants.write_output_file(resultsfile, jsonoutput)
     except Exception as e:
