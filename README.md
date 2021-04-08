@@ -25,9 +25,9 @@ DazedAndConfused is a tool to help determine dependency confusion exposure.
 ## INSTALLATION
 Clone this repo or download and unzip.
 
-Install the requirements by running - python (or python3) install -r requirements.txt
+Install the requirements by running - ```pip (or pip3) install -r requirements.txt```
 
-Create github personal token by clicking at the top right corner at your avatar and navigating to Settings > Developer Settings > Personal Access Tokens. Generate new token, make sure to copy it. Next, set all of the scopes for the repo. Finally, add token to your environment variables, name the token GITHUB_AUTH (PUBLIC_GITHUB_AUTH / GITLAB_AUTH for a public git server and gitlab server respectively). For example, for Mac or Linux it will look like export GITHUB_AUTH="YOUR_TOKEN_GOES_HERE".
+Create github personal token by clicking at the top right corner at your avatar and navigating to Settings > Developer Settings > Personal Access Tokens. Generate new token, make sure to copy it. Next, set all of the scopes for the repo. Finally, add token to your environment variables, name the token GITHUB_AUTH (PUBLIC_GITHUB_AUTH / GITLAB_AUTH for a public git server and gitlab server respectively). For example, for Mac or Linux it will look like ```export GITHUB_AUTH="YOUR_TOKEN_GOES_HERE"```.
 
 Finally, in the dac_constants.py file, ensure that GITLAB_URL / GITHUB_URL variables match the server you want to scan.
 
