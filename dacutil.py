@@ -44,8 +44,7 @@ def check_url(manifestname, url, resultsfile):
     try:
         data = urllib.request.urlopen(url).read().decode('ascii')
         singleresult = dac_contentscan.scan_contents(os.path.basename(manifestname), data)
-        jsonoutput = json.dumps(singleresult, indent=4)
-        dac_constants.write_output_file(resultsfile, jsonoutput)
+        dac_constants.write_output_file(resultsfile, singleresult)
     except Exception as e:
         print(f"Error: {e} in check_url")
 
