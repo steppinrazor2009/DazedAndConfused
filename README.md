@@ -221,3 +221,11 @@ A module in modules.json would look like this:
 
 * Lock files will be the only files checked for that module (instead of each "manifest_file").
 * config_file specifies a configuration file for that package manager.  If it exists, a function (specified by config_parse_func) must also exist in the python file which will return True or False depending on whether files for this package manager can be skipped. (this is useful in the event that a package manager is pointing to an internal registry and you want to skip scanning those files)
+<!---
+#
+# Copyright (c) 2021, salesforce.com, inc.
+# All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+# For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+#
+-->

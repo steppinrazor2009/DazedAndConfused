@@ -1,3 +1,9 @@
+#
+# Copyright (c) 2021, salesforce.com, inc.
+# All rights reserved.
+# SPDX-License-Identifier: BSD-3-Clause
+# For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
+#
 import dacfunctions.dac_contentscan as dac_contentscan
 import dacfunctions.dac_constants as dac_constants
 import time
