@@ -1,0 +1,12 @@
+gemfileparser==0.8.0
+toml==0.10.2
+lxml==4.6.2
+memoization==0.3.2
+requests==2.24.0
+pypi_simple==0.8.0
+ratelimit==2.2.1
+urllib3==1.25.11
+click==7.1.2
+helix_swarm==0.6.1
+pyarn==0.1.0
+pyyaml==5.4.1
