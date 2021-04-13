@@ -40,7 +40,6 @@ RateWarning = False
 
 #server constants
 GITHUB_URL = "https://github.com"#your github
-GITHUB_URL = "https://git.soma.salesforce.com"#your github
 GITHUB_AUTH = os.getenv("GITHUB_AUTH")
 GITLAB_URL = "https://gitlab.com"#your gitlab
 GITLAB_AUTH = os.getenv("GITLAB_AUTH")
