@@ -31,7 +31,7 @@ def single(projectid, resultsfile):
                     
     #do recap
     results['time_elapsed'] = time.time() - starttime
-    recap = dac_constants.get_dacgl_recap(results)
+    recap = get_dacgl_recap(results)
     results['vulnerable'] = recap['vulnerable']
     results['sus'] = recap['sus']
     dac_constants.write_output_file(resultsfile, results)
@@ -43,7 +43,26 @@ def full(resultsfile, conc):
     """ The [full] command scans all available projects on a gitlab server """
     starttime = time.time()
     results = dacgl_full.scan_all_projects(conc)
+    
+    #do recap
+    results['time_elapsed'] = time.time() - starttime
+    recap = get_dacgl_recap(results)
+    results['vulnerable'] = recap['vulnerable']
+    results['sus'] = recap['sus']
+    results['projects_scanned'] = recap['projects_scanned']    
     dac_constants.write_output_file(resultsfile, results) 
+
+#get recap info for the dacgl.py file    
+def get_dacgl_recap(results):
+    p = 0
+    v = 0
+    s = 0
+    for project in results['projects']:
+        p += 1
+        for file in project['files']:
+            v += len(file['vulnerable'])
+            s += len(file['sus'])
+    return {'projects_scanned': p, 'vulnerable': v, 'sus': s}
 
 if __name__ == '__main__':
     dazed_and_confused()

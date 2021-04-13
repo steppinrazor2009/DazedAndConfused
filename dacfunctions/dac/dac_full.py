@@ -25,6 +25,12 @@ class Counter(object):
         with self.lock:
             return self.val.value
 
+#Yield n number of striped chunks from l.
+def chunks(l, n):
+    for i in range(0, n):
+        yield l[i::n]
+
+
 logging.basicConfig(filename='dac.log', level=logging.INFO)
 
 #scans all orgs in git server
@@ -37,7 +43,7 @@ def scan_all_orgs(conc = 200, procs = 4):
     print(f"Done - {len(orgslist)} items retrieved!")
     try:
         #chunk the list of orgs for co-processing
-        orgchunks = list(dac_constants.chunks(orgslist, procs))
+        orgchunks = list(chunks(orgslist, procs))
         processes = []
         rets = []
         
@@ -66,12 +72,6 @@ def scan_all_orgs(conc = 200, procs = 4):
         #do recap
         results['time_elapsed'] = time.time() - starttime
         results['orgs_scanned'] = len(orgslist)
-        recap = dac_constants.get_dac_recap(results)
-        results['repos_scanned'] = recap['repos_scanned']
-        results['vulnerable'] = recap['vulnerable']
-        results['sus'] = recap['sus']
-        
-        results['orgs'] = sorted(results['orgs'], key = lambda i: str.casefold(i['org']))
         
         return results
     except Exception as e:

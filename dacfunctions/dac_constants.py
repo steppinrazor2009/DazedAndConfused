@@ -24,11 +24,6 @@ def load_text_to_list(filename):
         raise
     return result
 
-#Yield n number of striped chunks from l.
-def chunks(l, n):
-    for i in range(0, n):
-        yield l[i::n]
-
 #writes json output to filename
 def write_output_file(resultsfile, resultsjson, print_name=True):
     try:
@@ -40,51 +35,12 @@ def write_output_file(resultsfile, resultsjson, print_name=True):
     except Exception as e:
         print(f"Error: {e} in write_output_file")   
 
-#get recap info for the dac.py file
-def get_dac_recap(results):
-    r = 0
-    v = 0
-    s = 0
-    for org in results['orgs']:
-        r += len(org['repos'])
-        for repo in org['repos']:
-            for file in repo['files']:
-                v += len(file['vulnerable'])
-                s += len(file['sus'])
-    return {'repos_scanned': r, 'vulnerable': v, 'sus': s}
-
-#get recap info for the dacgl.py file    
-def get_dacgl_recap(results):
-    p = 0
-    v = 0
-    s = 0
-    for project in results['projects']:
-        p += 1
-        for file in project['files']:
-            v += len(file['vulnerable'])
-            s += len(file['sus'])
-    return {'projects_scanned': p, 'vulnerable': v, 'sus': s}
-
-#get recap info for the dacswarm.py file
-def get_swarm_recap(results):
-    v = 0
-    s = 0
-    b = 0
-    p = 0
-    for project in results['projects']:
-        for branch in project['branches']:
-            b += 1
-            for path in branch['paths']:
-                p += 1
-                for file in path['files']:
-                    v += len(file['vulnerable'])
-                    s += len(file['sus'])
-    return {'projects_scanned': len(results['projects']), 'branches_scanned': b, 'paths_scanned': p, 'vulnerable': v, 'sus': s}
 
 RateWarning = False
 
 #server constants
 GITHUB_URL = "https://github.com"#your github
+GITHUB_URL = "https://git.soma.salesforce.com"#your github
 GITHUB_AUTH = os.getenv("GITHUB_AUTH")
 GITLAB_URL = "https://gitlab.com"#your gitlab
 GITLAB_AUTH = os.getenv("GITLAB_AUTH")

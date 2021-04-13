@@ -35,14 +35,6 @@ def scan_all_projects(conc = 200):
                 index = next((index for (index, d) in enumerate(results['projects']) if d["id"] == tmp['id']), None)
                 results['projects'][index] = tmp
         
-        #do recap
-        results['time_elapsed'] = time.time() - starttime
-        recap = dac_constants.get_dacgl_recap(results)
-        results['vulnerable'] = recap['vulnerable']
-        results['sus'] = recap['sus']
-        results['projects_scanned'] = recap['projects_scanned']
-
-        
     except Exception as e:
         print(f"Error: {e} in scan_all_projects")
     return results

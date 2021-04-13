@@ -34,7 +34,7 @@ def single(org, repo, resultsfile):
                     
     #do recap
     results['time_elapsed'] = time.time() - starttime
-    recap = dac_constants.get_dac_recap(results)
+    recap = get_dac_recap(results)
     results['vulnerable'] = recap['vulnerable']
     results['sus'] = recap['sus']
     dac_constants.write_output_file(resultsfile, results)
@@ -51,7 +51,7 @@ def all(org, resultsfile, conc):
     
     #do recap
     results['time_elapsed'] = time.time() - starttime
-    recap = dac_constants.get_dac_recap(results)
+    recap = get_dac_recap(results)
     results['repos_scanned'] = recap['repos_scanned']
     results['vulnerable'] = recap['vulnerable']
     results['sus'] = recap['sus']
@@ -65,7 +65,28 @@ def full(resultsfile, conc, procs):
     """ The [full] command scans all available organizations on a github server """
     starttime = time.time()
     results = dac_full.scan_all_orgs(conc, procs)
+
+    #do recap    
+    recap = get_dac_recap(results)
+    results['repos_scanned'] = recap['repos_scanned']
+    results['vulnerable'] = recap['vulnerable']
+    results['sus'] = recap['sus']
+    results['orgs'] = sorted(results['orgs'], key = lambda i: str.casefold(i['org']))
+    
     dac_constants.write_output_file(resultsfile, results)                
+
+#get recap info for the dac.py file
+def get_dac_recap(results):
+    r = 0
+    v = 0
+    s = 0
+    for org in results['orgs']:
+        r += len(org['repos'])
+        for repo in org['repos']:
+            for file in repo['files']:
+                v += len(file['vulnerable'])
+                s += len(file['sus'])
+    return {'repos_scanned': r, 'vulnerable': v, 'sus': s}
 
 if __name__ == '__main__':
     dazed_and_confused()
