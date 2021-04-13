@@ -6,10 +6,6 @@
 #
 import dacfunctions.dac_contentscan as dac_contentscan
 import dacfunctions.dac_constants as dac_constants
-import json
-import requests
-import ssl
-import base64
 import concurrent.futures
 
 # checks a single repo for dependency confusion (now with threading!)
@@ -35,7 +31,6 @@ def check_single_repo(org, repo):
         #grab packages from this repo and pull the dependencies from them
         files = check_repo(repository)
         filecontents = get_all_manifest_contents(files, repository)
-        res = []
         for file in filecontents:
             if not file['override']:
                 #scan it
@@ -50,12 +45,11 @@ def check_single_repo(org, repo):
                 jsonresult['files'].append(scanresult['result'])
         #remove empty errors
         if len(jsonresult['errors']) == 0:
-               del jsonresult['errors']
+            del jsonresult['errors']
 
         jsonresult['files'] = sorted(jsonresult['files'], key = lambda i: str.casefold(i['file']))
-        
     except Exception as e:
-        if "new thread" not in str(e):
+        if "new thread" not in str(e) and "repository is empty" not in str(e):
             print(f"{org} : {repo} : Error: {e} in check_single_repo")
     return jsonresult
 

@@ -13,7 +13,6 @@ pypi_simple==0.8.0
 ratelimit==2.2.1
 urllib3==1.25.11
 click==7.1.2
-helix_swarm==0.6.1
 pyarn==0.1.0
 pyyaml==5.4.1
 github3.py==2.0.0

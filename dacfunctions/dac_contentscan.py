@@ -6,8 +6,6 @@
 #
 import dacfunctions.dac_constants as dac_constants
 import concurrent.futures
-import json
-import re
 from memoization import cached
 
 # creates nested object output for a single manifest file

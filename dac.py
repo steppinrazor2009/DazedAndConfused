@@ -5,13 +5,13 @@
 # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 #
 import dacfunctions.dac_constants as dac_constants
-import dacfunctions.dac_io as dac_io
 import dacfunctions.dac.dac_single as dac_single
 import dacfunctions.dac.dac_all as dac_all
 import dacfunctions.dac.dac_full as dac_full
 import time
-import json
 import click
+import urllib3
+urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
 CONTEXT_SETTINGS = dict(help_option_names=['-h', '--help'])
 

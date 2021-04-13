@@ -9,9 +9,7 @@ import dacfunctions.dac.dac_single as dac_single
 import dacfunctions.dac.dac_all as dac_all
 import multiprocessing
 import logging
-import json
 import time
-import re
 
 logging.basicConfig(filename='dac.log', level=logging.INFO)
 
