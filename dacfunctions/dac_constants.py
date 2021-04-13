@@ -110,7 +110,6 @@ if 'GITHUB_URL' in locals() and 'GITHUB_AUTH' in locals():
 if 'GITLAB_URL' in locals() and 'GITLAB_AUTH' in locals():
     GL = gitlab.Gitlab(GITLAB_URL, private_token=GITLAB_AUTH)
 
-
 #check modules.json and import our modules
 lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules'))
 sys.path.append(lib_path)
