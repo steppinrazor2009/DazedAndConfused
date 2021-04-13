@@ -11,12 +11,26 @@ import multiprocessing
 import logging
 import time
 
+#counter class for multiprocessing counter
+class Counter(object):
+    def __init__(self, initval=0):
+        self.val = multiprocessing.Value('i', initval)
+        self.lock = multiprocessing.Lock()
+
+    def increment(self):
+        with self.lock:
+            self.val.value += 1
+
+    def value(self):
+        with self.lock:
+            return self.val.value
+
 logging.basicConfig(filename='dac.log', level=logging.INFO)
 
 #scans all orgs in git server
 def scan_all_orgs(conc = 200, procs = 4):
     starttime = time.time()
-    counter = dac_constants.Counter(0)
+    counter = Counter(0)
     results = {'orgs_scanned': 0, 'repos_scanned': 0, 'vulnerable': 0, 'sus': 0, 'time_elapsed': 0, 'orgs':[]}
     print("Retrieving org list...")
     orgslist = check_orgs()

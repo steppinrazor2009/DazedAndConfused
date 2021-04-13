@@ -81,20 +81,6 @@ def get_swarm_recap(results):
                     s += len(file['sus'])
     return {'projects_scanned': len(results['projects']), 'branches_scanned': b, 'paths_scanned': p, 'vulnerable': v, 'sus': s}
 
-#counter class for multiprocessing counter
-class Counter(object):
-    def __init__(self, initval=0):
-        self.val = multiprocessing.Value('i', initval)
-        self.lock = multiprocessing.Lock()
-
-    def increment(self):
-        with self.lock:
-            self.val.value += 1
-
-    def value(self):
-        with self.lock:
-            return self.val.value
-
 RateWarning = False
 
 #URL constants
