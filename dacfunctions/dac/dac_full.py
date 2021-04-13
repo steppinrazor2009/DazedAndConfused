@@ -8,7 +8,6 @@ import dacfunctions.dac_constants as dac_constants
 import dacfunctions.dac.dac_single as dac_single
 import dacfunctions.dac.dac_all as dac_all
 import multiprocessing
-import logging
 import time
 
 #counter class for multiprocessing counter
@@ -29,9 +28,6 @@ class Counter(object):
 def chunks(l, n):
     for i in range(0, n):
         yield l[i::n]
-
-
-logging.basicConfig(filename='dac.log', level=logging.INFO)
 
 #scans all orgs in git server
 def scan_all_orgs(conc = 200, procs = 4):
@@ -83,7 +79,6 @@ def check_org_chunk(resultqueue, orgs, conc, counter):
     try:
         for org in orgs:
             res = dac_all.check_single_org(org, conc)
-            logging.info(f"{org}")
             results.append(res)
             counter.increment()   
             print(f"{counter.value()}:\t{org} ({res['scan_time']})")
