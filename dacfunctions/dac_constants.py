@@ -83,13 +83,19 @@ def get_swarm_recap(results):
 
 RateWarning = False
 
-#URL constants
-GITHUB_URL = "https://github.com"
-GITLAB_URL = "https://gitlab.com"#your internal gitlab
-
-#auth env variable constants
+#server constants
+GITHUB_URL = "https://github.com"#your github
 GITHUB_AUTH = os.getenv("GITHUB_AUTH")
+GITLAB_URL = "https://gitlab.com"#your gitlab
 GITLAB_AUTH = os.getenv("GITLAB_AUTH")
+
+#modules setup
+MODULES = {'modules' : []}
+
+#keywords
+INTERNAL_KEYWORDS = ['internal'] #list of keywords that indicate a private repository
+PRIVATE_KEYWORDS = load_text_to_list(os.path.abspath(os.path.join(os.path.dirname(__file__), '../keywordlists/privatekeywords.txt')))
+IGNORE_LIST = load_text_to_list(os.path.abspath(os.path.join(os.path.dirname(__file__), '../keywordlists/ignore.txt')))    
 
 if 'GITHUB_URL' in locals() and 'GITHUB_AUTH' in locals():
     GH = GitHubEnterprise(GITHUB_URL, token=GITHUB_AUTH, verify=False)
@@ -99,7 +105,6 @@ if 'GITLAB_URL' in locals() and 'GITLAB_AUTH' in locals():
 #check modules.json and import our modules
 lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules'))
 sys.path.append(lib_path)
-MODULES = {'modules' : []}
 
 #load modules.json
 with open(os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules.json'))) as f:
@@ -115,10 +120,3 @@ for module in MODULES['modules']:
     if 'config_file' in module:
         module['config_file'] = module['config_file'].lower()
         module['config_parse_func'] = getattr(module['d'], module['config_parse_func'])
-
-#keywords considered internal
-INTERNAL_KEYWORDS = ['internal'] #list of keywords that indicate a private repository
-
-#load our private and ignore lists
-PRIVATE_KEYWORDS = load_text_to_list(os.path.abspath(os.path.join(os.path.dirname(__file__), '../keywordlists/privatekeywords.txt')))
-IGNORE_LIST = load_text_to_list(os.path.abspath(os.path.join(os.path.dirname(__file__), '../keywordlists/ignore.txt')))    
