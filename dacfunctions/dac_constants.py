@@ -9,6 +9,7 @@ import os
 import multiprocessing
 import sys
 import importlib
+from github3 import GitHub, GitHubEnterprise
 
 #loads a line-by-line text file into a list        
 def load_text_to_list(filename):
@@ -93,23 +94,18 @@ class Counter(object):
         with self.lock:
             return self.val.value
 
+RateWarning = False
+
 #URL constants
-GITHUB_URL = "https://api.github.com"#your internal github enterprise
+#GITHUB_URL = "https://github.com"
+GITHUB_URL = "https://git.soma.salesforce.com"
 GITLAB_URL = "https://gitlab.com/api/v4"#your internal gitlab
 
 #auth env variable constants
 GITHUB_AUTH = os.getenv("GITHUB_AUTH")
 GITLAB_AUTH = os.getenv("GITLAB_AUTH")
 
-#header constants
-GITHUB_HEADERS = {
- 'Accept': 'application/vnd.github.v3+json',
- 'Authorization': 'bearer %s' % (GITHUB_AUTH),
-}
-GITLAB_HEADERS = {
-    'PRIVATE-TOKEN': GITLAB_AUTH
-}
-
+GH = GitHubEnterprise(GITHUB_URL, token=GITHUB_AUTH, verify=False)
 
 #check modules.json and import our modules
 lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules'))

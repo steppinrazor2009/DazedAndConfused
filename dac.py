@@ -29,7 +29,7 @@ def single(org, repo, resultsfile):
     """ The [single] command scans a single github repository """
     starttime = time.time()
     results = {'orgs_scanned': 0, 'repos_scanned': 1, 'vulnerable': 0, 'sus': 0, 'time_elapsed': 0, 'orgs': []}
-    singleresult = [{'org': org, 'repos': [dac_single.check_single_repo(org, repo, None)]}]
+    singleresult = [{'org': org, 'repos': [dac_single.check_single_repo(org, repo)]}]
     results['orgs'] = singleresult
                     
     #do recap

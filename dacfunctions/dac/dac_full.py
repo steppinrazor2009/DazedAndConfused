@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 #
-import dacfunctions.dac_io as dac_io
 import dacfunctions.dac_constants as dac_constants
 import dacfunctions.dac.dac_single as dac_single
 import dacfunctions.dac.dac_all as dac_all
@@ -82,20 +81,11 @@ def check_org_chunk(resultqueue, orgs, conc, counter):
 
 # get list of orgs
 def check_orgs():
-    since = 0
     results = []
-    pattern = 'since=(\d*)'
     try:
-        #since header handles paging for the git api
-        while since is not None:
-            res = dac_io.hit_branch(f"/organizations?per_page=100&since={since}")
-            for item in res['results']:
-                results.append(item['login'])
-            tmp = re.search(pattern, res['headers']['Link'])
-            if tmp:
-                since = tmp.group(1)
-            else:
-                since = None
+        orgs = dac_constants.GH.all_organizations()
+        for org in orgs:
+            results.append(org.login)
     except Exception as e:
         #print(f"Error: {e} in check_orgs")
         raise
