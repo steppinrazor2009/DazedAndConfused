@@ -5,7 +5,6 @@
 # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 #
 import dacfunctions.dac_constants as dac_constants
-import dacfunctions.dac_io as dac_io
 import dacfunctions.dacgl.dacgl_single as dacgl_single
 import dacfunctions.dacgl.dacgl_full as dacgl_full
 import time

@@ -4,7 +4,6 @@
 # SPDX-License-Identifier: BSD-3-Clause
 # For full license text, see the LICENSE file in the repo root or https://opensource.org/licenses/BSD-3-Clause
 #
-import dacfunctions.dac_io as dac_io
 import dacfunctions.dac_contentscan as dac_contentscan
 import dacfunctions.dac_constants as dac_constants
 import concurrent.futures
@@ -12,6 +11,7 @@ import requests
 import time
 import json
 import ssl
+import base64
 
 # checks a single repo for dependency confusion (now with threading!)
 def check_single_project(project):
@@ -20,11 +20,11 @@ def check_single_project(project):
         return jsonresult
     starttime = time.time()
     try:
-        project = check_single_gitlab_project(project)
-        jsonresult['project'] = project['name']
+        project = dac_constants.GL.projects.get(project)
+        jsonresult['project'] = project.name
         #grab packages from this repo and pull the dependencies from them
-        files = check_gitlab_repo(project['id'])
-        filecontents = get_all_gitlab_manifest_contents(files, project['id'], project['default_branch'])
+        files = check_gitlab_repo(project)
+        filecontents = get_all_gitlab_manifest_contents(files, project)
         res = []
         for file in filecontents:
             contents = file['content']
@@ -51,29 +51,15 @@ def check_single_project(project):
         print(f"Error: {e} in check_single_project")
     return jsonresult
 
-#checks a single gl project and returns the info we want
-def check_single_gitlab_project(projectid):
-    result = {}
-    try:
-        res = dac_io.hit_branch(f"/projects/{projectid}", "l")['results']
-        if res:
-            result['id'] = projectid
-            result['name'] = res['name']
-            result['default_branch'] = res['default_branch']
-    except Exception as e:
-        #print(f"Error: {e} in check_single_gitlab_project")
-        raise
-    return result
-
 #grabs all manifest file contents from gitlab
-def get_all_gitlab_manifest_contents(files, projectid, default_branch):
+def get_all_gitlab_manifest_contents(files, project):
     if not files:
         return []
     filecontents = []
     try:
         #grabs the file contents for all found files concurrently
         with concurrent.futures.ThreadPoolExecutor(max_workers=5) as executor:
-            fut = [executor.submit(get_single_gitlab_manifest_contents, file, projectid, default_branch, ) for file in files]
+            fut = [executor.submit(get_single_gitlab_manifest_contents, file, project, ) for file in files]
             for r in concurrent.futures.as_completed(fut):
                 tmp = r.result()
                 if tmp is not None:
@@ -85,22 +71,18 @@ def get_all_gitlab_manifest_contents(files, projectid, default_branch):
     return filecontents
 
 #grabs the contents from a single file
-def get_single_gitlab_manifest_contents(file, projectid, default_branch):
+def get_single_gitlab_manifest_contents(file, project):
     if file['override']:
         return {'file': file['name'], 'content': '', 'override': True}    
-    urlcontent = f"{dac_constants.GITLAB_URL}/projects/{projectid}/repository/files/{file['name']}/raw?ref={default_branch}"
-    r = requests.get(urlcontent, headers=dac_constants.GITLAB_HEADERS, verify=ssl.CERT_NONE)
-    try:
-        content = json.loads(r.content)
-    except:
-        content = r.content.decode('utf-8"')
+    file_info = project.repository_blob(file['id'])
+    content = base64.b64decode(file_info['content']).decode('utf-8')
     return {'file': file['name'], 'content': content, 'override': False}
 
 #checks a repo and finds the manifest files
 def check_gitlab_repo(project):
     files = []
     try:
-        res = dac_io.hit_branch(f"/projects/{project}/repository/tree", "l")['results']
+        res = project.repository_tree()
         if res:
             overrides = []
             for f in res:
@@ -111,7 +93,7 @@ def check_gitlab_repo(project):
                                 if module['config_parse_func'](get_single_gitlab_manifest_contents({'name': f['path'], 'override': False}, project['id'], project['default_branch'])):
                                     overrides = overrides + module['manifest_file'] + module['lock_file']
                             else:
-                                files.append({'name': f['path'], 'override': False})
+                                files.append({'name': f['path'], 'override': False, 'id': f['id']})
                                 if f['path'].lower() in module['lock_file']:
                                     for file in module['manifest_file'] + module['lock_file'][:-1]:
                                         if not f['path'].lower() == file.lower():

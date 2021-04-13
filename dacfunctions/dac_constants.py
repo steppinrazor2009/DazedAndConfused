@@ -9,6 +9,7 @@ import os
 import multiprocessing
 import sys
 import importlib
+import gitlab
 from github3 import GitHub, GitHubEnterprise
 
 #loads a line-by-line text file into a list        
@@ -97,15 +98,18 @@ class Counter(object):
 RateWarning = False
 
 #URL constants
-#GITHUB_URL = "https://github.com"
-GITHUB_URL = "https://git.soma.salesforce.com"
-GITLAB_URL = "https://gitlab.com/api/v4"#your internal gitlab
+GITHUB_URL = "https://github.com"
+GITLAB_URL = "https://gitlab.com"#your internal gitlab
 
 #auth env variable constants
 GITHUB_AUTH = os.getenv("GITHUB_AUTH")
 GITLAB_AUTH = os.getenv("GITLAB_AUTH")
 
-GH = GitHubEnterprise(GITHUB_URL, token=GITHUB_AUTH, verify=False)
+if 'GITHUB_URL' in locals() and 'GITHUB_AUTH' in locals():
+    GH = GitHubEnterprise(GITHUB_URL, token=GITHUB_AUTH, verify=False)
+if 'GITLAB_URL' in locals() and 'GITLAB_AUTH' in locals():
+    GL = gitlab.Gitlab(GITLAB_URL, private_token=GITLAB_AUTH)
+
 
 #check modules.json and import our modules
 lib_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '../modules'))
