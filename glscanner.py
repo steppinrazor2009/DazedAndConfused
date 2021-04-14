@@ -18,7 +18,7 @@ class GLScanner:
         self.RateWarning = False
         self.conc = conc
         #GitHub API wrapper
-        self.GL = gitlab.Gitlab("https://gitlab.com", private_token=os.getenv("GITLAB_AUTH"))
+        self.GL = gitlab.Gitlab(os.getenv("GITLAB_URL"), private_token=os.getenv("GITLAB_AUTH"))
         self.FILESCANNER = Scanner("./modules", "modules.json")
         
     # checks a single repo for dependency confusion (now with threading!)

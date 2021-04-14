@@ -19,7 +19,7 @@ class GHScanner:
         self.conc = conc
         self.procs = procs
         #GitHub API wrapper
-        self.GH = GitHubEnterprise("https://github.com", token=os.getenv("GITHUB_AUTH"), verify=False)
+        self.GH = GitHubEnterprise(os.getenv("GITHUB_URL"), token=os.getenv("GITHUB_AUTH"), verify=False)
         self.FILESCANNER = Scanner("./modules", "modules.json")
 
     #scans all orgs in git server
