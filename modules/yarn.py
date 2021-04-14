@@ -7,7 +7,7 @@
 ###
 #Checks YARN files for potential and active dependency confusion attacks
 ###
-import dacfunctions.dac_constants as dac_constants
+import dac_constants
 import urllib
 import re
 import json

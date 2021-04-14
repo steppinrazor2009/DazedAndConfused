@@ -7,7 +7,7 @@
 ###
 #Checks composer files for potential and active dependency confusion attacks
 ###
-import dacfunctions.dac_constants as dac_constants
+import dac_constants
 import urllib
 import json
 import re

@@ -7,7 +7,7 @@
 ###
 #Checks maven files for potential and active dependency confusion attacks
 ###
-import dacfunctions.dac_constants as dac_constants
+import dac_constants
 import urllib
 from lxml import etree as ElementTree
 from ratelimit import limits, sleep_and_retry

@@ -7,7 +7,7 @@
 ###
 #Checks Nuget.config files for potential vulnerability to dependency confusion attacks
 ###
-import dacfunctions.dac_constants as dac_constants
+import dac_constants
 import json
 import re
 from lxml import etree as ElementTree
