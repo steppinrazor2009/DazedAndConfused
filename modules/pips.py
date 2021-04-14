@@ -8,7 +8,7 @@
 #Checks pip files for potential and active dependency confusion attacks
 ###
 #grabs actual dependencies from a requirements.txt file
-import dacfunctions.dac_constants as dac_constants
+import dac_constants
 import toml
 import re
 import json

@@ -27,13 +27,12 @@ Clone this repo or download and unzip.
 
 Install the requirements by running - ```pip (or pip3) install -r requirements.txt```
 
-Create github personal token by clicking at the top right corner at your avatar and navigating to Settings > Developer Settings > Personal Access Tokens. Generate new token, make sure to copy it. Next, set all of the scopes for the repo. Finally, add token to your environment variables, name the token GITHUB_AUTH (PUBLIC_GITHUB_AUTH / GITLAB_AUTH for a public git server and gitlab server respectively). For example, for Mac or Linux it will look like ```export GITHUB_AUTH="YOUR_TOKEN_GOES_HERE"```.
-
-Finally, in the dac_constants.py file, ensure that GITLAB_URL / GITHUB_URL variables match the server you want to scan.
+Create github personal token by clicking at the top right corner at your avatar and navigating to Settings > Developer Settings > Personal Access Tokens. Generate new token, make sure to copy it. Next, set all of the scopes for the repo. Finally, add token to your environment variables, name the token GITHUB_AUTH  / GITLAB_AUTH for a  github server and gitlab server respectively. For example, for Mac or Linux it will look like ```export GITHUB_AUTH="YOUR_TOKEN_GOES_HERE"```.  Finally, add tokens to your environment variables named GITLAB_URL and GITHUB_URL which should match the server you want to scan.
 
 To improve the accuracy of results:
 * dac_constants.py - ensure that the INTERNAL_KEYWORDS list contains keywords which will match your internal package servers.
 * privatekeywords.txt seed the file with some private keywords (which are used to determine if a package is supposed to be private when checking for it on public registries).
+* ignore.txt any packages with names matching items in the ignore file will be completely ignored (this will speed up scanning).
 
 ## USAGE
 Once your environment variables are set (from above) and you have the correct URLs in place, follow the following usage guide:

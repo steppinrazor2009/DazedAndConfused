@@ -11,7 +11,7 @@ import requests
 import json
 import re
 import yaml
-import dacfunctions.dac_constants as dac_constants
+import dac_constants
 
 #grabs actual dependencies from a Podfile
 def get_cocoapods_dependencies(filename, contents):
