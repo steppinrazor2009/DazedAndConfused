@@ -14,12 +14,17 @@ from contentscanner import Scanner
 
 class GHScanner:
 
-    def __init__(self, conc=200, procs=4):
+    def __init__(self, conc=200, procs=4, public=False):
         self.RateWarning = False
         self.conc = conc
         self.procs = procs
+        self.public = public
         #GitHub API wrapper
-        self.GH = GitHubEnterprise(os.getenv("GITHUB_URL"), token=os.getenv("GITHUB_AUTH"), verify=False)
+        if public:
+            self.GH = GitHub(os.getenv("GITHUB_URL"), token=os.getenv("GITHUB_AUTH"))
+        else:
+            self.GH = GitHubEnterprise(os.getenv("GITHUB_URL"), token=os.getenv("GITHUB_AUTH"), verify=False)
+
         self.FILESCANNER = Scanner("./modules", "modules.json")
 
     #scans all orgs in git server
@@ -38,7 +43,7 @@ class GHScanner:
             #run each chunk with a different process
             resultqueue = multiprocessing.Queue()
             for chunk in orgchunks:
-                tmp = multiprocessing.Process(target=self.check_org_chunk, args=(resultqueue, chunk, self.conc, self.procs))
+                tmp = multiprocessing.Process(target=self.check_org_chunk, args=(resultqueue, chunk, self.conc, self.procs, self.public))
                 processes.append(tmp)
                 tmp.start()
             for process in processes:
@@ -69,7 +74,7 @@ class GHScanner:
     def check_orgs(self):
         results = []
         try:
-            orgs = self.GH.all_organizations()
+            orgs = self.GH.organizations()
             for org in orgs:
                 results.append(org.login)
         except Exception as e:
@@ -79,7 +84,7 @@ class GHScanner:
 
     #checks a single gh organization
     def check_single_org(self, org):
-        jsonresult = {'org': org, 'repos':[], 'errors': []}
+        jsonresult = {org:[], 'errors': []}
         starttime = time.time()
         try:
             #load up the repos for this org
@@ -92,7 +97,7 @@ class GHScanner:
                     scanresult = r.result()
                     if 'errors' in scanresult:
                         jsonresult['errors'].append(scanresult['repo'])
-                    jsonresult['repos'].append(scanresult)
+                    jsonresult[org].append(scanresult)
 
         except Exception as e:
             print(f"Error: {e} in check_single_org({org})")
@@ -100,15 +105,14 @@ class GHScanner:
         if len(jsonresult['errors']) == 0:
             del jsonresult['errors']
         jsonresult['scan_time'] = time.time() - starttime
-        jsonresult['repos'] = sorted(jsonresult['repos'], key = lambda i: str.casefold(i['repo']))
         return jsonresult
 
     # gets a list of repos for a git org
     def check_repos(self, org):
         ret = []
-        organization = self.GH.organization(org)
-        repos = organization.repositories(type="all")
         try:
+            organization = self.GH.organization(org)
+            repos = organization.repositories(type="all")
             for repo in repos:
                 ret.append(repo.name)
         except Exception as e:
@@ -118,7 +122,7 @@ class GHScanner:
 
     # checks a single repo for dependency confusion (now with threading!)
     def check_single_repo(self, org, repo):
-        jsonresult = {'repo': repo, 'files':[], 'errors': []}
+        jsonresult = {repo: [], 'errors': []}
         try:
             #check rate limits and sleep if need be
             core = self.GH.rate_limit()['resources']['core']
@@ -140,22 +144,18 @@ class GHScanner:
             files = self.check_repo(repository)
             filecontents = self.get_all_manifest_contents(files, repository)
             for file in filecontents:
-                if not file['override']:
-                    #scan it
-                    scanresult = self.FILESCANNER.scan_contents(file['file'], file['content'])
-                else:
-                    scanresult = {'result': {'file': file['file'], 'vulnerable': [], 'sus': [], 'override': True}}
+                #scan it
+                scanresult = self.FILESCANNER.scan_contents(file['file'], file['content'], file['override'])
 
                 #if we had errors, bubble them up
                 if 'errors' in scanresult:
                     jsonresult['errors'].append(scanresult['errors'])
                 else:
-                    jsonresult['files'].append(scanresult['result'])
+                    jsonresult[repo].append(scanresult)
             #remove empty errors
             if len(jsonresult['errors']) == 0:
                 del jsonresult['errors']
 
-            jsonresult['files'] = sorted(jsonresult['files'], key = lambda i: str.casefold(i['file']))
         except Exception as e:
             if "new thread" not in str(e) and "repository is empty" not in str(e):
                 print(f"{org} : {repo} : Error: {e} in check_single_repo")
@@ -227,10 +227,10 @@ class GHScanner:
             
     #checks a list of orgs for dependency confusion  
     @staticmethod
-    def check_org_chunk(resultqueue, orgs, conc, procs):
+    def check_org_chunk(resultqueue, orgs, conc, procs, public=False):
         results = []
         try:
-            ghscanner = GHScanner(conc, procs)
+            ghscanner = GHScanner(conc, procs, public)
             for org in orgs:
                 res = ghscanner.check_single_org(org)
                 results.append(res)
@@ -246,11 +246,14 @@ class GHScanner:
         v = 0
         s = 0
         for org in results['orgs']:
-            r += len(org['repos'])
-            for repo in org['repos']:
-                for file in repo['files']:
-                    v += len(file['vulnerable'])
-                    s += len(file['sus'])
+            r += len(org)
+            oname = next(iter(org))
+            for repo in org[oname]:
+                rname = next(iter(repo))
+                for file in repo[rname]:
+                    fname = next(iter(file))
+                    v += len(file[fname]['vulnerable'])
+                    s += len(file[fname]['sus'])
         return {'repos_scanned': r, 'vulnerable': v, 'sus': s}
 
     #writes json output to filename

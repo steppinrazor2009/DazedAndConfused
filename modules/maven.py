@@ -27,10 +27,10 @@ def get_maven_dependencies(filename, xml_file):
         xmldoc = ElementTree.fromstring(xml_file, parser)
         
         #get properties
-        propxml = xmldoc.findall('.//properties')[0]
+        propxml = xmldoc.findall('.//properties')
         properties = {}
         if propxml is not None and len(propxml) > 0:
-            for property in propxml:
+            for property in propxml[0]:
                 properties[property.tag] = property.text
         
         # grab repositories
@@ -59,8 +59,8 @@ def get_maven_dependencies(filename, xml_file):
                 version = dep.find('.//version')
                 if version is not None:
                     version = fix_prop(version.text, properties)
-                if ',' in version or 'SNAPSHOT' in version:
-                    version = None
+                    if ',' in version or 'SNAPSHOT' in version:
+                        version = None
                 #if there is a name, a groupid, and a non-snapshot, non-range version, then it isnt vulnerable
                 #otherwise, we add it to be checked
                 if gid is None or version is None:

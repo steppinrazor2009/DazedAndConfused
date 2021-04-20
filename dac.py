@@ -22,13 +22,12 @@ def dazed_and_confused():
 @click.option("-org", "-o", required=True, help="org name")
 @click.option("-repo", "-r", required=True, help="repo name")
 @click.option("-resultsfile", "-rf", required=True, help="file for results")
-def single(org, repo, resultsfile):
+@click.option('--public', '-p', is_flag=True, help="public GitHub.com")
+def single(org, repo, resultsfile, public):
     """ The [single] command scans a single github repository """
-    scanner = GHScanner()
+    scanner = GHScanner(public=public)
     starttime = time.time()
-    results = {'orgs_scanned': 0, 'repos_scanned': 1, 'vulnerable': 0, 'sus': 0, 'time_elapsed': 0, 'orgs': []}
-    singleresult = [{'org': org, 'repos': [scanner.check_single_repo(org, repo)]}]
-    results['orgs'] = singleresult
+    results = {'orgs_scanned': 0, 'repos_scanned': 1, 'vulnerable': 0, 'sus': 0, 'time_elapsed': 0, 'orgs': [{org: [scanner.check_single_repo(org, repo)]}]}
                     
     #do recap
     results['time_elapsed'] = time.time() - starttime
@@ -42,9 +41,10 @@ def single(org, repo, resultsfile):
 @click.option("-org", "-o", required=True, help="org name")
 @click.option("-resultsfile", "-rf", required=True, help="file for results")
 @click.option('--conc', "-c", default=200, show_default=True, help='Number of concurrent repo scans per org (higher for servers, lower for desktop/laptops)')
-def all(org, resultsfile, conc):
+@click.option('--public', '-p', is_flag=True, help="public GitHub.com")
+def all(org, resultsfile, conc, public):
     """ The [all] command scans all github repositories in a single organization """
-    scanner = GHScanner(conc)
+    scanner = GHScanner(conc, public=public)
     starttime = time.time()
     results = {'orgs_scanned': 1, 'repos_scanned': 0, 'vulnerable': 0, 'sus': 0, 'time_elapsed': 0, 'orgs': []}
     results['orgs'] = [scanner.check_single_org(org)]
@@ -61,9 +61,10 @@ def all(org, resultsfile, conc):
 @click.option("-resultsfile", "-rf", required=True, help="file for results")
 @click.option('--conc', "-c", default=200, show_default=True, help='Number of concurrent repo scans per org (higher for servers, lower for desktop/laptops)')
 @click.option('--procs', default=3, show_default=True, help='Number of concurrent processes to use for scanning orgs (roughly, how many cores to use)')
-def full(resultsfile, conc, procs):
+@click.option('--public', '-p', is_flag=True, help="public GitHub.com")
+def full(resultsfile, conc, procs, public):
     """ The [full] command scans all available organizations on a github server """
-    scanner = GHScanner(conc, procs)
+    scanner = GHScanner(conc, procs, public=public)
     starttime = time.time()
     results = scanner.scan_all_orgs()
 
@@ -72,7 +73,6 @@ def full(resultsfile, conc, procs):
     results['repos_scanned'] = recap['repos_scanned']
     results['vulnerable'] = recap['vulnerable']
     results['sus'] = recap['sus']
-    results['orgs'] = sorted(results['orgs'], key = lambda i: str.casefold(i['org']))
     scanner.write_output_file(resultsfile, results)                
 
 if __name__ == '__main__':

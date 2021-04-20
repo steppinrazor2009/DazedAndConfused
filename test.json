@@ -1,0 +1,35 @@
+{
+    "orgs_scanned": 1,
+    "repos_scanned": 2,
+    "vulnerable": 3,
+    "sus": 0,
+    "time_elapsed": 1.8764429092407227,
+    "orgs": [
+        {
+            "dacstuff": [
+                {
+                    "dactestfiles": [
+                        {
+                            "package.json": {
+                                "vulnerable": [
+                                    "bsteststuff",
+                                    "jsforce"
+                                ],
+                                "sus": []
+                            }
+                        },
+                        {
+                            "requirements.txt": {
+                                "vulnerable": [
+                                    "testbstuff1234"
+                                ],
+                                "sus": []
+                            }
+                        }
+                    ]
+                }
+            ],
+            "scan_time": 1.1616170406341553
+        }
+    ]
+}

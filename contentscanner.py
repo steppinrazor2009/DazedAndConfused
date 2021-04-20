@@ -36,34 +36,34 @@ class Scanner:
 
     # creates nested object output for a single manifest file
     @staticmethod
-    def create_single_output(file, res):
-        result = {'file': file, 'vulnerable': res['vulnerable'], 'sus': res['sus']}
+    def create_single_output(file, res, override):
+        if override:
+            result = {file: {'vulnerable': [], 'sus': [], 'override': True}}
+        else:
+            result = {file: {'vulnerable': res['vulnerable'], 'sus': res['sus']}}
         return result
 
     #checks a data string for dependency confusion
-    def scan_contents(self, name, data):
+    def scan_contents(self, name, data, override=False):
         errstr = ""
         try:
             singleresult = {}
             res = []
-            #check file to see if we have a module for it
-            for module in self.MODULES['modules']:
-                if name.lower() in module['manifest_file'] or name.lower() in module['lock_file']:
-                    errstr = f"{module['parse_func'].__name__}({name}, data)"
-                    res = self.check_dependencies(module['parse_func'](name, data), module['repo_check_func'])
-                    break            
+            if not override:
+                #check file to see if we have a module for it
+                for module in self.MODULES['modules']:
+                    if name.lower() in module['manifest_file'] or name.lower() in module['lock_file']:
+                        errstr = f"{module['parse_func'].__name__}({name}, data)"
+                        res = self.check_dependencies(module['parse_func'](name, data), module['repo_check_func'])
+                        break            
 
             #creates the output object for this result and append it to
             #the overall output if there was an actual vuln or sus
-            singleresult = self.create_single_output(name, res)
-
-            #return our results and an empty error list
-            return {'result': singleresult}
+            singleresult = self.create_single_output(name, res, override)
         except Exception as e:
             #print(f"File validation error: {e} in scan_contents")
-            return {'result': singleresult, 'errors': errstr}
-
-
+            singleresult['errors'] = errstr
+        return singleresult
 
     #check each dependency (now with threads!)
     def check_dependencies(self, deps, repo_check_method):
